@@ -1,0 +1,44 @@
+POST http://localhost:8080/api/post/prompt HTTP/1.1
+Content-Type: application/json
+
+{
+    "gpt" : "asdfsadkla"
+}
+###/openai/get_assistant
+GET http://localhost:8000/fastapi/openai/get_assistant?assistant_id=asst_Bz8pah0kaEULlhHM4xHRcsKX HTTP/1.1
+Content-Type: application/json
+
+###/openai/get_thread
+GET http://localhost:8000/fastapi/openai/get_thread?thread_id=thread_h2A5dGWSHD26lIldYzE51Ywt HTTP/1.1
+Content-Type: application/json
+
+###/openai/get_messages
+GET http://localhost:8000/fastapi/openai/get_messages?thread_id=thread_h2A5dGWSHD26lIldYzE51Ywt HTTP/1.1
+Content-Type: application/json
+
+
+###/openai/retrieve_run
+GET http://localhost:8000/fastapi/openai/retrieve_run?thread_id=thread_h2A5dGWSHD26lIldYzE51Ywt&run_id=run_D5r3wNyPXw6uHsM7sGfyWewr
+Content-Type: application/json
+
+
+###/openai/list_runs
+GET http://localhost:8000/fastapi/openai/list_runs?thread_id=thread_h2A5dGWSHD26lIldYzE51Ywt HTTP/1.1
+Content-Type: application/json
+
+
+
+###/openai/create_message
+POST http://localhost:8000/fastapi/openai/create_message HTTP/1.1
+Content-Type: application/json
+
+{
+    "role": "user",
+    "content":"응 출력해",
+    "thread_id": "thread_h2A5dGWSHD26lIldYzE51Ywt"
+}
+
+
+###/openai/create_run
+GET http://localhost:8000/fastapi/openai/create_run?thread_id=thread_h2A5dGWSHD26lIldYzE51Ywt&assistant_id=asst_Bz8pah0kaEULlhHM4xHRcsKX HTTP/1.1
+Content-Type: application/json
