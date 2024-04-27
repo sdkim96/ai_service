@@ -1,9 +1,10 @@
 [tool.poetry]
-name = "externals"
+name = "ai_service"
 version = "0.1.0"
 description = "use for api"
 authors = ["sdkim96"]
 readme = "README.md"
+packages = [{include = "apps"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
