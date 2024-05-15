@@ -19,8 +19,6 @@ class Settings(BaseSettings):
     allow_methods: list
     allow_headers: list
 
-
-
     _callback: any = None
     _sessionlog: any = None
 
