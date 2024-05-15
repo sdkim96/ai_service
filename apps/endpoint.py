@@ -4,6 +4,7 @@ from starlette.concurrency import run_in_threadpool
 
 from apps.schema import *
 from apps.openais import messages, runs, threads, assistants
+from apps.crud.metadb import Metadb
 
 router = APIRouter()
 
@@ -28,6 +29,7 @@ class ObjectCaching():
 
 # FastAPI 의존성 주입 시스템을 사용하여 객체 캐싱
 cache = ObjectCaching()
+db = Metadb()
 
         
 
@@ -79,8 +81,10 @@ async def get_runs(thread_id: str, run_client: runs.Runs = Depends(cache.get_run
 @router.post("/openai/create_message", response_model=Message)
 async def create_message(body: CreateMessageInput, message_client: messages.Messages = Depends(cache.get_message_client)):
     thread_message = message_client.create_message(thread_id=body.thread_id, role=body.role, content=body.content)
+    print(thread_message)
     if not thread_message:
         raise HTTPException(status_code=404, detail="No messages found for the given thread ID.")
+    db.insert_message_list(thread_message)
     return thread_message
 
 

@@ -1,80 +1,75 @@
-from typing import (Any, Dict, Iterator, List, Optional, Literal, Sequence, Tuple, Union,)
-from apps.config import get_settings
-from sqlalchemy import create_engine
+from sqlalchemy.orm import scoped_session, sessionmaker
+from sqlalchemy import create_engine, text
 from sqlalchemy.engine.url import URL
-from sqlalchemy.orm import sessionmaker
+from contextlib import contextmanager
+from apps.config import get_settings
+from typing import Literal
 
-from apps.schema import Message
+from apps.schema import Assistant, Message
 
-def truncate_word(content: Any, *, length: int, suffix: str = "...") -> str:
-    if not isinstance(content, str) or length <= 0:
-        return content
- 
-    if len(content) <= length:
-        return content
- 
-    return content[: length - len(suffix)].rsplit(" ", 1)[0] + suffix
+# Helper function to manage session lifecycle
+@contextmanager
+def session_scope():
+    conf = get_settings()
+    url = URL.create(
+        drivername="mysql+mysqlconnector",
+        username=conf.mysql_user,
+        password=conf.mysql_password,
+        host=conf.mysql_host,
+        port=conf.mysql_port,
+        database=conf.mysql_db,
+    )
+    engine = create_engine(url, pool_recycle=360, pool_pre_ping=True, pool_size=3, max_overflow=5)
+    session_factory = sessionmaker(bind=engine)
+    session = scoped_session(session_factory)
+    try:
+        yield session
+        session.commit()
+    except:
+        session.rollback()
+        raise
+    finally:
+        session.close()
 
-
-class Metadb():
-
-    _db = None
-
-    @property
-    def db(self):
-        if self.__class__._db is None:
-            conf = get_settings()
-            url = URL.create(
-                drivername="mysql+mysqlconnector",
-                username=conf.mysql_user,
-                password=conf.mysql_password,
-                host=conf.mysql_host,
-                port=conf.mysql_port,
-                database=conf.mysql_db,
-            )
-            engine = create_engine(url, pool_recycle=360, pool_pre_ping=True, pool_size=3, max_overflow=5)
-            self.__class__._db = sessionmaker(bind=engine)()
-        return self.__class__._db
-    
-
-    def run(
-        self,
-        command: str,
-        fetch: Literal["all", "one"] = "all",
-        include_columns: bool = False,
-    ) -> str:
-        """Execute a SQL command and return a string representing the results.
- 
-        If the statement returns rows, a string of the results is returned.
-        If the statement returns no rows, an empty string is returned.
-        """
-        result = self.db._execute(command, fetch)
- 
-        res = [
-            {
-                # column: truncate_word(value, length=self.__class__.db._max_string_length)
-                column: truncate_word(value, length=6000)
-                for column, value in r.items()
-            }
-            for r in result
-        ]
- 
-        if not include_columns:
-            res = [tuple(row.values()) for row in res]
- 
-        return res
-    
-
-    
-
-    
-
-    def insert_messages_list(self, messages: Message) -> str:
-        sql="""
-            INSERT INTO messages (thread_id, status, incomplete_details, completed_at, role, content, assistant_id, run_id, attachments)
-
-            
-            """
+class Metadb:
+    def run(self, command: str, parameters: dict = None, fetch: Literal["all", "one"] = "all"):
+        with session_scope() as session:
+            result = session.execute(text(command), parameters)
+            if fetch == "all":
+                rows = result.fetchall()
+            elif fetch == "one":
+                rows = result.fetchone()
+            return rows
         
-        return ""
 
+    def insert_assistant(self, assistant):
+        sql = """
+            INSERT INTO assistant (assistant_id, created_at, name, model, instructions, user_id)
+            VALUES (:id, :created_at, :name, :model, :instructions, :user_id)
+        """
+        parameters = {
+            "id": assistant.id,
+            "created_at": assistant.created_at,
+            "name": assistant.name,
+            "model": assistant.model,
+            "instructions": assistant.instructions,
+            "user_id": "김성동"  # Assuming static user ID for the example
+        }
+        self.run(sql, parameters)
+
+    def insert_message_list(self, messages):
+        sql = """
+            INSERT INTO message (message_id, created_at, thread_id, role, content, assistant_id, run_id, user_id)
+            VALUES (:id, :created_at, :thread_id, :role, :content, :assistant_id, :run_id, :user_id)
+        """
+        parameters = {
+            "id": messages.id,
+            "created_at": messages.created_at,
+            "thread_id": messages.thread_id,
+            "role": messages.role,
+            "content": messages.content.text[0].value,
+            "assistant_id": messages.assistant_id,
+            "run_id": messages.run_id,
+            "user_id": "김성동"  # Assuming static user ID for the example
+        }
+        self.run(sql, parameters)

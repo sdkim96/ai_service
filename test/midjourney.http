@@ -1,0 +1,14 @@
+###/메세지 create하기
+POST https://api.mymidjourney.ai/api/v1/midjourney/imagine HTTP/1.1
+Content-Type: application/json
+Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MzA2NTUsImVtYWlsIjoic2Vvbmc5NjA2MDNAZ21haWwuY29tIiwidXNlcm5hbWUiOiJzZW9uZzk2MDYwM0BnbWFpbC5jb20iLCJpYXQiOjE3MTQyMzEwODR9.pwE-_sA62Eu4p5GmjRHhAtNID1MR42gY7Xzlcu21_8I
+
+{
+  "prompt": "Here's the setup for designing a logo for an automotive company: What: Design a logo for a modern, dynamic automotive company. Include elements that symbolize speed and technology, such as car shapes or slanted lines that represent acceleration. Who: A logo that represents an innovative, performance-focused automobile manufacturing company. How: A sharp, powerful style, using a red and black color scheme that conveys a sense of dynamism. The images created based on this setup boil down to the following Dynamic logo design for an automotive company that emphasizes innovation and speed. Uses red and black colors to emphasize passion and performance, and includes design elements representing car shapes and acceleration. Easy to use in a variety of media."
+}
+
+
+###/메세지 가져오기
+
+GET https://api.mymidjourney.ai/api/v1/midjourney/message/8a476291-6832-441a-8cfb-8bdfa857e9cd
+Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MzA2NTUsImVtYWlsIjoic2Vvbmc5NjA2MDNAZ21haWwuY29tIiwidXNlcm5hbWUiOiJzZW9uZzk2MDYwM0BnbWFpbC5jb20iLCJpYXQiOjE3MTQyMzEwODR9.pwE-_sA62Eu4p5GmjRHhAtNID1MR42gY7Xzlcu21_8I
